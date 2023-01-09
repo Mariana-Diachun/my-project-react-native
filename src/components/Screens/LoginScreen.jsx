@@ -15,25 +15,13 @@ const initialState = {
   password: "",
 };
 
-export function LoginScreen() {
+const LoginScreen = () => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
 
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [rightIcon, setRightIcon] = useState("eye");
   const [rightIconColor, setRightIconColor] = useState("#0C8A7B");
-
-  const handlePasswordVisibility = () => {
-    if (rightIcon === "eye") {
-      setRightIcon("eye-slash");
-      //setRightIconColor('#FF0000')
-      setPasswordVisibility(!passwordVisibility);
-    } else if (rightIcon === "eye-slash") {
-      setRightIcon("eye");
-      //setRightIconColor('#0C8A7B')
-      setPasswordVisibility(!passwordVisibility);
-    }
-  };
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
@@ -77,7 +65,7 @@ export function LoginScreen() {
               }
             />{" "}
             <TouchableOpacity onPress={handlePasswordVisibility}>
-              <Icon name={rightIcon} size={25} color={rightIconColor} />
+              {/* <Icon name={rightIcon} size={25} color={rightIconColor} /> */}
             </TouchableOpacity>
           </View>
           <TouchableOpacity
@@ -94,7 +82,7 @@ export function LoginScreen() {
       </View>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   box: {
@@ -140,3 +128,5 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
 });
+
+export default LoginScreen;
