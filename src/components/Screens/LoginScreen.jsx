@@ -1,13 +1,19 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+// import { Font } from "expo";
+// import AppLoading from "expo-app-loading";
 import {
   View,
   Text,
+  Image,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
   Platform,
   StyleSheet,
   Keyboard,
+  Dimensions,
+  ImageBackground,
 } from "react-native";
 
 const initialState = {
@@ -15,118 +21,180 @@ const initialState = {
   password: "",
 };
 
+// const loadFonts = async () => {
+//   await Font.loadAsync({
+//     "Roboto-Regular": require("../../../assets/fonts/Roboto-Regular.ttf"),
+//     "Roboto-Medium": require("../../../assets/fonts/Roboto-Medium.ttf"),
+//   });
+// };
+
 const LoginScreen = () => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
-  const [state, setState] = useState(initialState);
+  const [formState, setFormState] = useState(initialState);
+  // const [isReady, setIsReady] = useState(false);
+  const [dimensions, setDimensions] = useState(
+    Dimensions.get("window").width - 20 * 2
+  );
 
-  const [passwordVisibility, setPasswordVisibility] = useState(true);
-  const [rightIcon, setRightIcon] = useState("eye");
-  const [rightIconColor, setRightIconColor] = useState("#0C8A7B");
+  useEffect(() => {
+    const onChange = () => {
+      const width = Dimensions.get("window").width - 20 * 2;
+      setDimensions(width);
+    };
+    Dimensions.addEventListener("change", onChange);
+    return () => {
+      Dimensions.removeEventListener("change", onChange);
+    };
+  }, []);
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
-    console.log(state);
-    setState(initialState);
+    console.log(formState);
+    setFormState(initialState);
   };
 
+  // if (!isReady) {
+  //   return (
+  //     <AppLoading startAsync={loadFonts} onFinish={() => setIsReady(true)} />
+  //   );
+  // }
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS == "ios" ? "padding" : "height"}
-    >
-      <View style={styles.box}>
-        <View
-          style={{
-            ...styles.form,
-            marginBottom: isShowKeyboard ? 32 : 144,
-          }}
+    <TouchableWithoutFeedback onPress={keyboardHide}>
+      <View style={styles.container}>
+        <ImageBackground
+          style={styles.image}
+          source={require("../../Images/bgImage.jpg")}
         >
-          <Text style={styles.title}>Log in</Text>
-          <View style={{ marginTop: 20 }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Email address"
-              onFocus={() => setIsShowKeyboard(true)}
-              value={state.email}
-              onChangeText={(value) =>
-                setState((prevState) => ({ ...prevState, email: value }))
-              }
-            />
+          <View style={styles.box}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS == "ios" ? "padding" : "height"}
+            >
+              <View
+                style={{
+                  ...styles.form,
+                  marginBottom: isShowKeyboard ? 10 : 66,
+                  width: dimensions,
+                }}
+              >
+                <View>
+                  <Text style={styles.title}>Log in</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email address"
+                    value={formState.email}
+                    onChangeText={(value) =>
+                      setFormState((prevState) => ({
+                        ...prevState,
+                        email: value,
+                      }))
+                    }
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    value={formState.password}
+                    onChangeText={(value) =>
+                      setFormState((prevState) => ({
+                        ...prevState,
+                        password: value,
+                      }))
+                    }
+                    secureTextEntry={true}
+                  />
+                  <TouchableOpacity
+                    activeOpacity={0.6}
+                    style={styles.regBtn}
+                    onPress={keyboardHide}
+                  >
+                    <Text style={styles.btnText}>LOG IN</Text>
+                  </TouchableOpacity>
+                  {isShowKeyboard ? null : (
+                    <>
+                      <TouchableOpacity>
+                        <Text style={styles.textNav}>
+                          Do non have an accaunt still? SIGN IN
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </View>
+              </View>
+            </KeyboardAvoidingView>
           </View>
-          <View style={{ marginTop: 20 }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              secureTextEntry={passwordVisibility}
-              onFocus={() => setIsShowKeyboard(true)}
-              value={state.password}
-              onChangeText={(value) =>
-                setState((prevState) => ({ ...prevState, password: value }))
-              }
-            />{" "}
-            <TouchableOpacity onPress={handlePasswordVisibility}>
-              {/* <Icon name={rightIcon} size={25} color={rightIconColor} /> */}
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.btn}
-            onPress={keyboardHide}
-          >
-            <Text style={styles.btnTitle}>SIGN IN</Text>
-          </TouchableOpacity>
-          <Text style={styles.textLink}>
-            Still don't have an account? SIGN IN
-          </Text>
-        </View>
+        </ImageBackground>
       </View>
-    </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  box: {
+  container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  box: {
+    position: "relative",
+    alignItems: "center",
+    // minWidth: "100%",
     borderTopLeftRadius: 25,
     borderTopEndRadius: 25,
     backgroundColor: "#FFFFFF",
-    width: "100%",
-    height: "70%",
+    // paddingBottom: 30,
   },
   form: {
-    marginHorizontal: 16,
-    // marginBottom: 78,
+    // marginHorizontal: 40,
   },
   title: {
+    // fontFamily: "Roboto-Medium",
+    letterSpacing: 0.01,
+    fontSize: 30,
+    lineHeight: 35,
     textAlign: "center",
     color: "#212121",
-    fontSize: 30,
-    fontWeight: "500",
-    marginTop: 92,
-    marginBottom: 33,
+    marginTop: 80,
+    marginBottom: 10,
   },
   input: {
+    // fontFamily: "Roboto-Regular",
     height: 50,
     borderWidth: 1,
     borderRadius: 8,
     padding: 16,
+    marginTop: 16,
     borderColor: "#E8E8E8",
     backgroundColor: "#F6F6F6",
   },
-  btn: {
+  regBtn: {
     backgroundColor: "#FF6C00",
     height: 51,
-    borderRadius: 100,
-    marginTop: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    // width: 343,
+    borderRadius: 50,
+    marginTop: 43,
+    marginBottom: 16,
+    paddingVertical: 16,
   },
-  btnTitle: { color: "#FFFFFF", fontSize: 16 },
-  textLink: {
+  btnText: {
+    // fontFamily: "Roboto-Regular",
+    fontSize: 16,
+    lineHeight: 19,
+    color: "white",
+    textAlign: "center",
+  },
+  textNav: {
     color: "#1B4371",
     textAlign: "center",
-    marginTop: 16,
+    // fontFamily: "Roboto-Regular",
+    fontSize: "16px",
+    lineHeight: "19px",
   },
 });
 
-export default LoginScreen;
+export default RegistrationScreen;
