@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import { Font } from 'expo';
+import * as Font from 'expo-font';
 
 import {
   View,
@@ -56,9 +56,9 @@ const RegistrationScreen = () => {
       setDimensions(width);
     };
     Dimensions.addEventListener('change', onChange);
-    // return () => {
-    //   Dimensions.removeEventListener('change', onChange);
-    // };
+    return () => {
+      Dimensions.removeEventListener('change', onChange);
+    };
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
