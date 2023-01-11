@@ -32,7 +32,16 @@ const RegistrationScreen = () => {
   const [dimensions, setDimensions] = useState(
     Dimensions.get('window').width - 20 * 2
   );
-  const [isShowingPassword, setIsShowingPassword] = useState(false);
+  const [isSecuredText, setIsSecuredText] = useState(true);
+
+  const btnWidthHandler = () => {
+    setDimensions(Dimensions.get('window').width - 20 * 2);
+  };
+
+  useEffect(() => {
+    dimensionsHandler = Dimensions.addEventListener('change', btnWidthHandler);
+    return () => dimensionsHandler.remove();
+  }, []);
 
   useEffect(() => {
     async function prepare() {
@@ -48,17 +57,6 @@ const RegistrationScreen = () => {
       }
     }
     prepare();
-  }, []);
-
-  useEffect(() => {
-    const onChange = () => {
-      const width = Dimensions.get('window').width - 20 * 2;
-      setDimensions(width);
-    };
-    Dimensions.addEventListener('change', onChange);
-    return () => {
-      Dimensions.removeEventListener('change', onChange);
-    };
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
@@ -77,9 +75,11 @@ const RegistrationScreen = () => {
     console.log(formState);
     setFormState(initialState);
   };
+
   const showPassword = () => {
-    setIsShowingPassword(true);
+    setIsSecuredText(!isSecuredText);
   };
+
   return (
     <TouchableWithoutFeedback onPress={keyboardHide}>
       <View style={styles.container} onLayout={onLayoutRootView}>
@@ -99,7 +99,10 @@ const RegistrationScreen = () => {
                 }}
               >
                 <View style={styles.imgFrame}>
-                  <TouchableOpacity activeOpacity={0.6}>
+                  <TouchableOpacity
+                    activeOpacity={0.6}
+                    style={styles.btnAddWrap}
+                  >
                     <Image
                       style={styles.btnAdd}
                       source="../../Images/add.png"
@@ -112,6 +115,7 @@ const RegistrationScreen = () => {
                   style={styles.input}
                   placeholder="Login"
                   value={formState.login}
+                  onFocus={() => setIsShowKeyboard(true)}
                   onChangeText={value =>
                     setFormState(prevState => ({
                       ...prevState,
@@ -123,6 +127,7 @@ const RegistrationScreen = () => {
                   style={styles.input}
                   placeholder="Email address"
                   value={formState.email}
+                  onFocus={() => setIsShowKeyboard(true)}
                   onChangeText={value =>
                     setFormState(prevState => ({
                       ...prevState,
@@ -135,18 +140,19 @@ const RegistrationScreen = () => {
                     style={styles.input}
                     placeholder="Password"
                     value={formState.password}
+                    onFocus={() => setIsShowKeyboard(true)}
                     onChangeText={value =>
                       setFormState(prevState => ({
                         ...prevState,
                         password: value,
                       }))
                     }
-                    secureTextEntry={setIsShowingPassword}
+                    secureTextEntry={isSecuredText}
                   />
                   <TouchableOpacity
                     style={styles.showPwdBtn}
                     activeOpacity={0.4}
-                    onPress={() => showPassword}
+                    onPress={showPassword}
                   >
                     <Text style={styles.textPwd}>Show</Text>
                   </TouchableOpacity>
@@ -182,7 +188,6 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'flex-end',
-    alignItems: 'center',
   },
   box: {
     position: 'relative',
@@ -191,10 +196,9 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopEndRadius: 25,
     backgroundColor: '#FFFFFF',
-    paddingBottom: 30,
   },
   form: {
-    // marginHorizontal: 40,
+    // marginBottom: 100,
   },
   imgFrame: {
     position: 'absolute',
@@ -204,6 +208,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
     alignSelf: 'center',
     top: -60,
+  },
+  btnAdd: {
+    position: 'absolute',
+    top: 84,
+    left: 107,
+    width: 25,
+    height: 25,
   },
   wrap: {
     position: 'relative',
@@ -220,15 +231,11 @@ const styles = StyleSheet.create({
     right: 16,
     margin: 0,
   },
-
-  btnAdd: {
-    color: '#FF6C00',
-    position: 'absolute',
-    top: 84,
-    left: 107,
-    width: 25,
-    height: 25,
+  btnAddWrap: {
+    flex: 1,
+    position: 'relative',
   },
+
   title: {
     fontFamily: 'Roboto-Medium',
     letterSpacing: 0.01,
@@ -252,7 +259,6 @@ const styles = StyleSheet.create({
   regBtn: {
     backgroundColor: '#FF6C00',
     height: 51,
-    // width: 343,
     borderRadius: 50,
     marginTop: 43,
     marginBottom: 16,
